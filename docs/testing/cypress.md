@@ -2,84 +2,33 @@
 Cypress is a great E2E testing tool. Here are a few great reasons to consider it:
 
 * Isolated installation possible.
-* Ships with TypeScript definitions out of the box.
+* Ships with TypeScript support out of the box.
 * Provides a nice interactive google chrome debug experience. This is very similar to how UI devs mostly work manually.
 * Has command - execution separation which allows for more powerful debugging and test stability (more on this below).
 * Has implicit assertions to provide more meaningful debug experience with less brittle tests (more on this in the tips below).
 * Provides the ability to mock out and observe backend XHRs easily without changing your application code (more on this in the tips below).
 
 ## Installation
+The steps provided in this installation process will give you a nice `e2e` folder that you can copy/paste or as boiler plate for your organization.
 
-> You can skip this section by just cloning [the template github repo 🌹](https://github.com/basarat/cypress-ts)
+> Same steps presented in a video format over at my [youtube channel](https://www.youtube.com/watch?v=n3SvvZSWwfM).
 
-> The steps provided in this installation process will give you a nice `e2e` folder that you can use as boiler plate for your organization. You can just copy paste this `e2e` folder into any existing projects that you want to test with cypress.
-
-Create an e2e directory and install cypress and its dependencies for TypeScript transpiling:
+Create an e2e directory, install cypress, TypeScript and setup the typescript and cypress config files:
 
 ```sh
 mkdir e2e
 cd e2e
 npm init -y
-npm install cypress webpack @cypress/webpack-preprocessor typescript ts-loader
+npm install cypress typescript
+npx tsc --init --types cypress --lib dom,es6
+echo {} > cypress.json 
 ```
 
 > Here are a few reasons for creating a separate `e2e` folder especially for cypress:
 * Creating a separate directory or `e2e` makes it easier to isolate its `package.json` dependencies from the rest of your project. This results in less dependency conflicts.
 * Testing frameworks have a habit of polluting the global namespace with stuff like `describe` `it` `expect`. It is best to keep the e2e `tsconfig.json` and `node_modules` in this special `e2e` folder to prevent global type definition conflicts.
 
-Setup TypeScript `tsconfig.json` e.g.
-
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "sourceMap": true,
-    "module": "commonjs",
-    "target": "es5",
-    "lib": [
-      "dom",
-      "es6"
-    ],
-    "jsx": "react",
-    "experimentalDecorators": true
-  },
-  "compileOnSave": false
-}
-```
-
-Do a first dry run of cypress to prime the cypress folder structure. The Cypress IDE will open. You can close it after you see the welcome message.
-
-```sh
-npx cypress open
-```
-
-Setup cypress for transpiling typescript by editing `e2e/cypress/plugins/index.js` to match the following:
-
-```js
-const wp = require('@cypress/webpack-preprocessor')
-module.exports = (on) => {
-  const options = {
-    webpackOptions: {
-      resolve: {
-        extensions: [".ts", ".tsx", ".js"]
-      },
-      module: {
-        rules: [
-          {
-            test: /\.tsx?$/,
-            loader: "ts-loader",
-            options: { transpileOnly: true }
-          }
-        ]
-      }
-    },
-  }
-  on('file:preprocessor', wp(options))
-}
-```
-
-
-Optionally add a few scripts to the `e2e/package.json` file:
+Add a few scripts to the `e2e/package.json` file:
 
 ```json
   "scripts": {
@@ -88,25 +37,31 @@ Optionally add a few scripts to the `e2e/package.json` file:
   },
 ```
 
+Write your first test under `cypress/integration/basic.ts`: 
+
+```ts
+it('should perform basic google search', () => {
+  cy.visit('https://google.com');
+  cy.get('[name="q"]')
+    .type('subscribe')
+    .type('{enter}');
+});
+```
+
+Now run `npm run cypress:open` during development and `npm run cypress:run` on your build server 🌹
+
 ## More description of key Files
 Under the `e2e` folder you now have these files:
 
 * `/cypress.json`: Configure cypress. The default is empty and that is all you need.
 * `/cypress` Subfolders:
-    * `/fixtures`: Test fixtures
-        * Comes with `example.json`. Feel free to delete it.
-        * You can create simple `.json` files that can be used to provide sample data (aka fixtures) for usage across tests.
     * `/integration`: All your tests.
-        * Comes with an `examples` folder. You can safely delete it.
-        * Name tests with `.spec.ts` e.g. `something.spec.ts`.
         * Feel free to create tests under subfolders for better organization e.g. `/someFeatureFolder/something.spec.ts`.
 
 ## First test
-* create a file `/cypress/integration/first.spec.ts` with the following contents:
+* create a file `/cypress/integration/first.ts` with the following contents:
 
 ```ts
-/// <reference types="cypress"/>
-
 describe('google search', () => {
   it('should work', () => {
     cy.visit('http://www.google.com');

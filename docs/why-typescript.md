@@ -32,6 +32,7 @@ This type inference is well motivated. If you do stuff like shown in this exampl
 
 ### Types can be Explicit
 As we've mentioned before, TypeScript will infer as much as it can safely. However, you can use annotations to:
+
 1. Help along the compiler, and more importantly document stuff for the next developer who has to read your code (that might be future you!).
 1. Enforce that what the compiler sees, is what you thought it should see. That is your understanding of the code matches an algorithmic analysis of the code (done by the compiler).
 
@@ -40,7 +41,7 @@ TypeScript uses postfix type annotations popular in other *optionally* annotated
 ```ts
 var foo: number = 123;
 ```
-So if you do something wrong the compiler will error e.g.:
+So if you do something wrong the compiler will report an error e.g.:
 
 ```ts
 var foo: number = '123'; // Error: cannot assign a `string` to a `number`
@@ -140,7 +141,7 @@ var inc = x => x+1;
 In this section we have provided you with the motivation and design goals of TypeScript. With this out of the way we can dig into the nitty gritty details of TypeScript.
 
 [](Interfaces are open ended)
-[](Type Inferernce rules)
+[](Type Inference rules)
 [](Cover all the annotations)
 [](Cover all ambients : also that there are no runtime enforcement)
 [](.ts vs. .d.ts)

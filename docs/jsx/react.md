@@ -53,6 +53,24 @@ const MyComponent: React.FunctionComponent<Props> = (props) => {
 <MyComponent foo="bar" />
 ```
 
+### Void Function Components
+
+As of [@types/react PR #46643](https://github.com/DefinitelyTyped/DefinitelyTyped/pull/46643), you can use a new `React.VoidFunctionComponent` or `React.VFC` type if you wish to declare that a component does not take `children`. This is an interim solution until the next major version of the type defs (where VoidFunctionComponent will be deprecated and FunctionComponent will by default accept no children).
+
+```ts
+type Props = { 
+  foo: string 
+}
+// OK now, in future, error
+const FunctionComponent: React.FunctionComponent<Props> = ({ foo, children }: Props) => {
+    return <div>{foo} {children}</div>; // OK
+};
+// Error now (children not support), in future, deprecated
+const VoidFunctionComponent: React.VoidFunctionComponent<Props> = ({ foo, children }) => {
+    return <div>{foo}{children}</div>; 
+};
+```
+
 ### Class Components
 
 Components are type checked based on the `props` property of the component. This is modeled after how JSX is transformed i.e. the attributes become the `props` of the component.
@@ -151,7 +169,7 @@ const foo = <T>(x: T) => x; // ERROR : unclosed `T` tag
 **Workaround**: Use `extends` on the generic parameter to hint the compiler that it's a generic, e.g.:
 
 ```ts
-const foo = <T extends {}>(x: T) => x;
+const foo = <T extends unknown>(x: T) => x;
 ```
 
 ### React Tip: Strongly Typed Refs 
@@ -259,4 +277,28 @@ ReactDOM.render(
   <Hello framework="React" />, // TypeScript React
   document.getElementById("root")
 );
+```
+
+## Declaring a webcomponent
+
+If you are using a web component the default React type definitions (`@types/react`) will not know about it. But you can declare it easily e.g. to declare a webcomponent called `my-awesome-slider` that takes Props `MyAwesomeSliderProps` you would: 
+
+```tsx
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'my-awesome-slider': MyAwesomeSliderProps;
+    }
+
+    interface MyAwesomeSliderProps extends React.Attributes {
+      name: string;
+    }
+  }
+}
+```
+
+Now you can use it in TSX:
+
+```tsx
+<my-awesome-slider name='amazing'/>
 ```
